@@ -1,0 +1,12 @@
+ultralytics
+opencv-python
+numpy
+pandas
+pandas
+seaborn
+scipy
+scikit-learn
+supervision
+lap
+filterpy
+cython_bbox
