@@ -1,30 +1,37 @@
-import supervision as sv
-import numpy as np
+from deep_sort_realtime.deepsort_tracker import DeepSort
 
 class MOTTracker:
     def __init__(self):
-        self.tracker = sv.ByteTrack()
-
-    def update(self, detections):
-
-        if len(detections) == 0:
-            return []
-
-        xyxy = np.array([d["bbox"] for d in detections], dtype=np.float32)
-        confidence = np.array([d["confidence"] for d in detections], dtype=np.float32)
-        class_id = np.array([d["class"] for d in detections], dtype=np.int32)
-
-        # 🔎 DEBUG HERE
-        print("XYXY SHAPE:", xyxy.shape)
-        print("CONF SHAPE:", confidence.shape)
-        print("CLASS SHAPE:", class_id.shape)
-
-        sv_detections = sv.Detections(
-            xyxy=xyxy,
-            confidence=confidence,
-            class_id=class_id
+        self.tracker = DeepSort(
+            max_age=60,                # survive occlusion
+            n_init=5,                  # confirm track
+            max_cosine_distance=0.15,  # strong appearance match
+            nn_budget=300,
+            embedder="mobilenet",
+            half=True                  # FP16 on RTX
         )
 
-        tracks = self.tracker.update_with_detections(sv_detections)
+    def update(self, detections, frame):
+
+        player_detections = []
+
+        for d in detections:
+            if d["class"] != 0:  # track only players
+                continue
+
+            x1, y1, x2, y2 = d["bbox"]
+            w = x2 - x1
+            h = y2 - y1
+
+            player_detections.append((
+                [x1, y1, w, h],
+                d["confidence"],
+                "player"
+            ))
+
+        tracks = self.tracker.update_tracks(
+            player_detections,
+            frame=frame
+        )
 
         return tracks

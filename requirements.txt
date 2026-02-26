@@ -10,3 +10,4 @@ supervision
 lap
 filterpy
 cython_bbox
+deep-sort-realtime
