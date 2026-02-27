@@ -1,8 +1,9 @@
 from ultralytics import YOLO
 import os
 
-model = YOLO('yolov8m.pt').to('cuda')
-input_path = "./data/raw_video/match1.mp4"
+model_path="./src1/models/best.pt"
+model = YOLO(model=model_path).to('cuda')
+input_path = "./data/raw_video/match1_tiny.mp4"
 
 result = model.predict(
     input_path,
