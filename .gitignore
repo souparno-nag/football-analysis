@@ -210,6 +210,7 @@ __marimo__/
 # data
 data/
 input_videos/
+football-players-detection-1/
 
 # models
 *.pt

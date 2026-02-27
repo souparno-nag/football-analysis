@@ -11,3 +11,5 @@ lap
 filterpy
 cython_bbox
 deep-sort-realtime
+roboflow
+ipykernel
