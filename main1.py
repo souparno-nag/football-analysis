@@ -1,18 +1,12 @@
-from ultralytics import YOLO
-import os
+from src1.utils import read_video, save_video
 
-model_path="./src1/models/best.pt"
-model = YOLO(model=model_path).to('cuda')
-input_path = "./data/raw_video/match1_tiny.mp4"
+def main():
+    # Read Video
+    input_video_path = "./data/raw_video/match1.mp4"
+    video_frames = read_video(input_video_path)
+    # Save Video
+    output_video_path = "./data/output/output1.mp4"
+    save_video(video_frames, output_video_path)
 
-result = model.predict(
-    input_path,
-    save=True,
-    project=os.path.abspath('data'),  # absolute path
-    name='output',
-    exist_ok=True
-)
-print(result[0])
-print("=================================================")
-for box in result[0].boxes: # type: ignore
-    print(box)
+if __name__ == "__main__":
+    main()
