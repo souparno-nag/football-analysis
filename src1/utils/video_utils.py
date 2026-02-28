@@ -13,7 +13,7 @@ def read_video(video_path):
 
 # takes a list of frames and saves it as a video at the specified path
 def save_video(output_video_frames, output_video_path, fps=25):
-    fourcc = cv2.VideoWriter.fourcc(*'XVID')
+    fourcc = cv2.VideoWriter.fourcc(*'mp4v')
     out = cv2.VideoWriter(output_video_path, fourcc, fps, (output_video_frames[0].shape[1], output_video_frames[0].shape[0]))
     for frame in output_video_frames:
         out.write(frame)
