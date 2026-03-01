@@ -1,7 +1,9 @@
 import cv2
+import numpy as np
 from src1.utils import read_video, save_video
 from src1.tracker import Tracker
 from src1.team_assigner import TeamAssigner
+from src1.player_ball_assigner import PlayerBallAssigner
 
 def main():
     # Read Video
@@ -39,13 +41,28 @@ def main():
     #     save_path = "./data/image/cropped_img.jpg"
     #     cv2.imwrite(save_path, croped_player)
     #     break
+
+    # Assign Ball Acquisition
+    player_assigner = PlayerBallAssigner()
+    team_ball_control= []
+    for frame_num, player_track in enumerate(tracks['players']):
+        ball_bbox = tracks['ball'][frame_num][1]['bbox']
+        assigned_player = player_assigner.assign_ball_to_player(player_track, ball_bbox)
+
+        if assigned_player != -1:
+            tracks['players'][frame_num][assigned_player]['has_ball'] = True
+            team_ball_control.append(tracks['players'][frame_num][assigned_player]['team'])
+        else:
+            team_ball_control.append(team_ball_control[-1])
+    team_ball_control= np.array(team_ball_control)
+
     
     # Draw Output
     # Draw Object Tracks on Frames
-    output_video_frames = tracker.draw_annotations(video_frames, tracks)
+    output_video_frames = tracker.draw_annotations(video_frames, tracks, team_ball_control)
 
     # Save Video
-    output_video_path = "./data/output/output3.mp4"
+    output_video_path = "./data/output/output5.mp4"
     save_video(output_video_frames, output_video_path)
 
 if __name__ == "__main__":
