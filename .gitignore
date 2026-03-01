@@ -214,3 +214,5 @@ football-players-detection-1/
 
 # models
 *.pt
+
+ca.psiphon.PsiphonTunnel.tunnel-core
