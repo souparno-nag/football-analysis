@@ -4,6 +4,7 @@ import pickle
 import os
 import cv2
 import numpy as np
+import pandas as pd
 import sys
 # sys.path.append("../")
 from src1.utils import get_center_of_bbox, get_bbox_width
@@ -125,6 +126,18 @@ class Tracker:
         cv2.drawContours(frame, [triangle_points],0,(0,0,0), 2)
 
         return frame
+    
+    def interpolate_ball_positions(self,ball_positions):
+        ball_positions = [x.get(1,{}).get('bbox',[]) for x in ball_positions]
+        df_ball_positions = pd.DataFrame(ball_positions,columns=['x1','y1','x2','y2'])
+
+        # Interpolate missing values
+        df_ball_positions = df_ball_positions.interpolate()
+        df_ball_positions = df_ball_positions.bfill()
+
+        ball_positions = [{1: {"bbox":x}} for x in df_ball_positions.to_numpy().tolist()]
+
+        return ball_positions
     
     # def draw_team_ball_control(self,frame,frame_num,team_ball_control):
     #     # Draw a semi-transparent rectangle 
