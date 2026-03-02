@@ -9,6 +9,7 @@ from src1.view_transformer import ViewTransformer
 from src1.speed_and_distance_estimator import SpeedAndDistance_Estimator
 from src1.pass_detector import PassDetector
 from src1.tactical_map import TacticalMap
+from src1.space_control import SpaceControl
 
 def main():
     # Read Video
@@ -87,6 +88,9 @@ def main():
     tactical_map = TacticalMap()
     # Save the heatmap as a static image
     tactical_map.draw_tactical_map(tracks, output_path="./data/image/tactical_heatmap.jpg")
+
+    # Initialize Space Control with the updated ViewTransformer
+    space_control = SpaceControl(view_transformer)
     
     # Draw Output
     # Draw Object Tracks on Frames
@@ -97,9 +101,11 @@ def main():
     speed_and_distance_estimator.draw_speed_and_distance(output_video_frames,tracks)
     # Draw Passes
     output_video_frames = pass_detector.draw_passes(output_video_frames, tracks)
+    # Draw Team Control (Red vs Blue zones)
+    output_video_frames = space_control.draw_voronoi(output_video_frames, tracks, mode='team')
 
     # Save Video
-    output_video_path = "./data/output/output9.avi"
+    output_video_path = "./data/output/output10.avi"
     save_video(output_video_frames, output_video_path)
 
 if __name__ == "__main__":

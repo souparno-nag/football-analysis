@@ -22,6 +22,8 @@ class ViewTransformer():
         self.target_vertices = self.target_vertices.astype(np.float32)
 
         self.persepctive_trasnformer = cv2.getPerspectiveTransform(self.pixel_vertices, self.target_vertices)
+        # Inverse transform to draw back on video
+        self.inverse_perspective_transformer = cv2.getPerspectiveTransform(self.target_vertices, self.pixel_vertices)
 
     def transform_point(self,point):
         p = (int(point[0]),int(point[1]))
@@ -43,3 +45,14 @@ class ViewTransformer():
                     if position_trasnformed is not None:
                         position_trasnformed = position_trasnformed.squeeze().tolist()
                     tracks[object][frame_num][track_id]['position_transformed'] = position_trasnformed
+
+    def inverse_transform(self, points):
+        """
+        Transforms points from 2D Pitch Coordinate system back to Video Pixel system
+        """
+        if len(points) == 0:
+            return []
+        
+        points = np.array(points).reshape(-1, 1, 2).astype(np.float32)
+        transformed_points = cv2.perspectiveTransform(points, self.inverse_perspective_transformer)
+        return transformed_points.reshape(-1, 2).astype(np.int32)
