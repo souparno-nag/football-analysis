@@ -7,6 +7,8 @@ from src1.player_ball_assigner import PlayerBallAssigner
 from src1.camera_movement_estimator import CameraMovementEstimator
 from src1.view_transformer import ViewTransformer
 from src1.speed_and_distance_estimator import SpeedAndDistance_Estimator
+from src1.pass_detector import PassDetector
+from src1.tactical_map import TacticalMap
 
 def main():
     # Read Video
@@ -29,7 +31,7 @@ def main():
                                                                                 stub_path='./data/stubs/camera_movement_stub.pkl')
     camera_movement_estimator.add_adjust_positions_to_tracks(tracks,camera_movement_per_frame)
 
-    # View Trasnformer
+    # View Transformer
     view_transformer = ViewTransformer()
     view_transformer.add_transformed_position_to_tracks(tracks)
     
@@ -77,6 +79,14 @@ def main():
             team_ball_control.append(team_ball_control[-1])
     team_ball_control= np.array(team_ball_control)
 
+    pass_detector = PassDetector()
+    passes = pass_detector.detect_passes(tracks)
+    print(f"Detected {len(passes)} passes.")
+
+    # Tactical Map
+    tactical_map = TacticalMap()
+    # Save the heatmap as a static image
+    tactical_map.draw_tactical_map(tracks, output_path="./data/image/tactical_heatmap.jpg")
     
     # Draw Output
     # Draw Object Tracks on Frames
@@ -85,9 +95,11 @@ def main():
     output_video_frames = camera_movement_estimator.draw_camera_movement(output_video_frames,camera_movement_per_frame)
     ## Draw Speed and Distance
     speed_and_distance_estimator.draw_speed_and_distance(output_video_frames,tracks)
+    # Draw Passes
+    output_video_frames = pass_detector.draw_passes(output_video_frames, tracks)
 
     # Save Video
-    output_video_path = "./data/output/output8.avi"
+    output_video_path = "./data/output/output9.avi"
     save_video(output_video_frames, output_video_path)
 
 if __name__ == "__main__":
